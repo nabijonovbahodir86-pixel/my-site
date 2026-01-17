@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<title>4-5 yosh vizual aralash test</title>
+<style>
+  body {
+    font-family: Arial;
+    background: #f0fff0;
+    text-align: center;
+    padding-top: 20px;
+  }
+  h1 { margin-bottom: 10px; }
+  #question { font-size: 24px; margin: 20px; min-height: 80px; }
+  .item {
+    width: 50px;
+    height: 50px;
+    display: inline-block;
+    margin: 5px;
+    cursor: pointer;
+  }
+  .answer-btn {
+    display: inline-block;
+    font-size: 22px;
+    padding: 15px 30px;
+    margin: 10px;
+    border-radius: 15px;
+    text-decoration: none;
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+  }
+  .answer-btn:hover { background-color: #45a049; }
+  #result { font-size: 22px; margin: 20px; color: green; min-height: 30px; }
+</style>
+</head>
+<body>
+
+<h1>🧸 4-5 yosh vizual aralash test</h1>
+
+<div id="question"></div>
+<div id="answers"></div>
+<h3 id="result"></h3>
+<h3>⭐ Ball: <span id="score">0</span> / 30</h3>
+
+<script>
+// Rang va shakl variantlari
+const colors = ["red","blue","green","yellow","orange","purple","pink"];
+const shapes = ["circle","square","triangle"];
+
+// 30 ta aralash savol yaratish
+const questions = [];
+for(let i=0;i<30;i++){
+  const type = Math.random()<0.5 ? "visual" : "math"; // vizual yoki arifmetika
+  let correct = Math.floor(Math.random()*5)+1; // 1-5
+  let wrongs = [];
+  while(wrongs.length<2){
+    let w = Math.floor(Math.random()*5)+1;
+    if(w!==correct && !wrongs.includes(w)) wrongs.push(w);
+  }
+  let answers = [correct, wrongs[0], wrongs[1]];
+  answers.sort(()=>Math.random()-0.5);
+
+  if(type==="visual"){
+    const shapeType = shapes[i % shapes.length]; // har savol shakli o‘zgarsa
+    questions.push({type, c: correct, shape: shapeType, text: `Necha ${shapeType} bor?`});
+  } else {
+    const a = Math.floor(Math.random()*5)+1;
+    const b = Math.floor(Math.random()*5)+1;
+    const qText = `${a} + ${b} = ?`;
+    questions.push({type, c: a+b, text: qText, a: a, b: b});
+  }
+}
+
+let score = 0;
+let index = 0;
+
+function createItem(shape){
+  const div = document.createElement("div");
+  const color = colors[Math.floor(Math.random()*colors.length)];
+  if(shape==="circle"){
+    div.style.width = "50px";
+    div.style.height = "50px";
+    div.style.backgroundColor = color;
+    div.style.borderRadius = "50%";
+  } else if(shape==="square"){
+    div.style.width = "50px";
+    div.style.height = "50px";
+    div.style.backgroundColor = color;
+    div.style.borderRadius = "0";
+  } else if(shape==="triangle"){
+    div.style.width = "0";
+    div.style.height = "0";
+    div.style.backgroundColor = "transparent";
+    div.style.borderLeft = "25px solid transparent";
+    div.style.borderRight = "25px solid transparent";
+    div.style.borderBottom = `50px solid ${color}`;
+  }
+  div.classList.add("item");
+  return div;
+}
+
+function getAnswers(correct){
+  let answers = [correct];
+  while(answers.length<3){
+    let w = correct + Math.floor(Math.random()*3) - 1;
+    if(w<0) w=0;
+    if(!answers.includes(w)) answers.push(w);
+  }
+  return answers.sort(()=>Math.random()-0.5);
+}
+
+function showQuestion(){
+  if(index >= questions.length){
+    document.body.innerHTML = `<h1>🎉 Tugadi!</h1><h2>Ball: ${score}/${questions.length}</h2>`;
+    return;
+  }
+
+  const q = questions[index];
+  const container = document.getElementById("question");
+  container.innerHTML = q.text;
+
+  const answerDiv = document.getElementById("answers");
+  answerDiv.innerHTML = "";
+
+  let answersArr = [];
+  if(q.type==="visual"){
+    container.innerHTML = `<p>${q.text}</p>`;
+    const itemContainer = document.createElement("div");
+    for(let i=0;i<q.c;i++){
+      itemContainer.appendChild(createItem(q.shape));
+    }
+    container.appendChild(itemContainer);
+    answersArr = getAnswers(q.c);
+  } else {
+    answersArr = getAnswers(q.c);
+  }
+
+  // Javob tugmalari
+  let html = "";
+  answersArr.forEach(a=>{
+    html += `<a href="#" class="answer-btn" onclick="check(${a})">${a}</a>`;
+  });
+  answerDiv.innerHTML = html;
+}
+
+function check(a){
+  const correct = questions[index].c;
+  if(a === correct){
+    score++;
+    document.getElementById("result").innerText = "🎉 To‘g‘ri!";
+  } else {
+    document.getElementById("result").innerText = `❌ Xato, to‘g‘ri javob: ${correct}`;
+  }
+  document.getElementById("score").innerText = score;
+  index++;
+  setTimeout(()=>{
+    document.getElementById("result").innerText="";
+    showQuestion();
+  },800);
+}
+
+// Boshlash
+showQuestion();
+</script>
+<a href="index.html">Ortga qaytish</a>
+</body>
+</html>

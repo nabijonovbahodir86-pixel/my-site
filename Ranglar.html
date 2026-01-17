@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<title>4 yosh rang testlari</title>
+<style>
+  body {
+    font-family: Arial;
+    background: #fff7e6;
+    text-align: center;
+    padding-top: 20px;
+  }
+  h1 { margin-bottom: 10px; }
+  #question { font-size: 24px; margin: 20px; }
+  .color-box {
+    width: 120px;
+    height: 120px;
+    display: inline-block;
+    margin: 15px;
+    border-radius: 20px;
+    cursor: pointer;
+  }
+  #result { font-size: 22px; margin: 20px; color: green; }
+  #score { font-size: 22px; }
+</style>
+</head>
+<body>
+
+<h1>🧸 4 yosh rang testlari</h1>
+
+<div id="question"></div>
+<div id="answers"></div>
+<h3 id="result"></h3>
+<h3>⭐ Ball: <span id="score">0</span> / 20</h3>
+
+<script>
+let score = 0;
+let index = 0;
+
+// Rang nomlari va mapping
+const colorMap = {
+  "qizil":"red",
+  "ko‘k":"blue",
+  "yashil":"green",
+  "sariq":"yellow",
+  "qora":"black",
+  "oq":"white",
+  "to‘q sariq":"orange",
+  "binafsha":"purple",
+  "pushti":"pink",
+  "jigarrang":"brown"
+};
+
+const colors = Object.keys(colorMap);
+
+// Takrorlanmas 20 ta savol yaratish
+const shuffledColors = [...colors].sort(()=>0.5 - Math.random()); // Ranglarni aralashtiramiz
+const questions = [];
+
+for(let i=0;i<20;i++){
+  let correct = shuffledColors[i % shuffledColors.length]; // 20 ta bo‘lishi uchun takrorlash kerak bo‘lsa ham keyingi sikl
+
+  // Noto‘g‘ri javoblar
+  let wrongs = colors.filter(c=>c!==correct);
+  wrongs.sort(()=>0.5 - Math.random());
+  wrongs = wrongs.slice(0,2);
+
+  // Javoblarni aralashtirish
+  let answers = [correct, wrongs[0], wrongs[1]];
+  answers.sort(()=>0.5 - Math.random());
+
+  questions.push({
+    q: `"${correct}" rangni top`,
+    c: correct,
+    a: answers
+  });
+}
+
+function showQuestion(){
+  if(index >= questions.length){
+    document.body.innerHTML = `<h1>🎉 Tugadi!</h1><h2>Ball: ${score}/${questions.length}</h2>`;
+    return;
+  }
+
+  document.getElementById("question").innerText = questions[index].q;
+
+  let html = "";
+  questions[index].a.forEach(color=>{
+    html += `<div class="color-box" style="background:${colorMap[color]}" onclick="check('${color}')"></div>`;
+  });
+
+  document.getElementById("answers").innerHTML = html;
+}
+
+function check(color){
+  if(color === questions[index].c){
+    score++;
+    document.getElementById("result").innerText = "🎉 To‘g‘ri!";
+  } else {
+    document.getElementById("result").innerText = "❌ Xato";
+  }
+  document.getElementById("score").innerText = score;
+  index++;
+  setTimeout(()=>{
+    document.getElementById("result").innerText="";
+    showQuestion();
+  },700);
+}
+
+// O‘yinni boshlash
+showQuestion();
+</script>
+<a href="yosh.html">Ortga qaytish</a>
+</body>
+</html>
+
+
